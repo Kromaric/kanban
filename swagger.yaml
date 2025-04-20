@@ -1,0 +1,15 @@
+openapi: 3.0.0
+
+info:
+  title:
+  description:
+  version:
+
+servers:
+  - url: http://localhost:5500
+    description: Local server
+
+components:
+  schemas:
+
+paths:
