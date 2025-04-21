@@ -3,6 +3,13 @@ const sequelize = require("./db");
 async function syncDB() {
   await sequelize.sync();
 }
+const Card = require("./models/Card");
+const Category = require("./models/Category");
+const CardCategory = require("./models/CardCategory");
+
+Card.belongsToMany(Category, { through: CardCategory });
+Category.belongsToMany(Card, { through: CardCategory });
+
 
 syncDB()
   .then(() => {

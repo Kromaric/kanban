@@ -3,3 +3,5 @@ functions/
 tests/
 package-lock.json
 .env
+sync.js
+db.js
