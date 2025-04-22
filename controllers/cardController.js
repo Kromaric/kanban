@@ -93,6 +93,26 @@ module.exports = {
     }
   },
 
+  //Deplace une carte dans une colonne
+  async moveCard(req, res) {
+    try {
+      const { id } = req.params;
+      const { newColumnId } = req.body;
+  
+      const card = await Card.findByPk(id);
+      if (!card) {
+        return res.status(404).json({ message: "Card not found" });
+      }
+  
+      card.columnId = newColumnId;
+      await card.save();
+  
+      res.json({ message: "Card moved successfully", card });
+    } catch (error) {
+      res.status(500).json({ message: "Error moving card", error });
+    }
+  },
+  
   // Supprime une carte
   async deleteCard(req, res) {
     try {

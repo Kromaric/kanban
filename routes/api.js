@@ -11,6 +11,8 @@ function createApiRoutes() {
   router.get("/cards/:id", cardController.getCardById);
   router.put("/cards/:id", cardController.updateCard);
   router.delete("/cards/:id", cardController.deleteCard);
+  // Déplacement d'une carte
+  router.put("/cards/:id/move", cardController.moveCard);
 
   //CRUD pour les colonnes
   router.get("/columns", columnController.getAllColumns);
