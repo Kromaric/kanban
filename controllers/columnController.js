@@ -3,7 +3,11 @@ const { Column } = require("../models");
 // Récupérer toutes les colonnes
 exports.getAllColumns = async (req, res) => {
   try {
-    const columns = await Column.findAll();
+    const columns = await Column.findAll(
+        {
+            order: [['position', 'ASC']]
+        }
+    );
     res.json(columns);
   } catch (err) {
     res.status(500).json({ message: "Erreur lors de la récupération des colonnes", error: err.message });

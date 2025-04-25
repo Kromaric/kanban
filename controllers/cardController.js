@@ -5,8 +5,9 @@ module.exports = {
   async getAllCards(req, res) {
     try {
       const cards = await Card.findAll({
+        order: [['position', 'ASC']],
         include: [
-          { model: Column, as: "column" },
+          { model: Column, as: "column", order: [['position', 'ASC']]},
           { model: Category, as: "categories", through: { attributes: [] } },
         ],
       });
