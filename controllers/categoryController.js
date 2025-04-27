@@ -61,7 +61,8 @@ exports.deleteCategory = async (req, res) => {
       return res.status(404).json({ message: "Category not found" });
     }
     await category.destroy();
-    res.json({ message: "Category deleted successfully" });
+    //res.json({ message: "Category deleted successfully" });
+    res.sendStatus(204).send();
   } catch (err) {
     res.status(500).json({ message: "Error deleting category", error: err.message });
   }

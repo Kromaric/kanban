@@ -1,4 +1,6 @@
 const { Card, Column, Category } = require("../models");
+const { Sequelize } = require('sequelize');
+
 
 module.exports = {
   // Liste toutes les cartes
@@ -7,7 +9,7 @@ module.exports = {
       const cards = await Card.findAll({
         order: [['position', 'ASC']],
         include: [
-          { model: Column, as: "column", order: [['position', 'ASC']]},
+          { model: Column, as: "column", order: [['position', 'ASC']] },
           { model: Category, as: "categories", through: { attributes: [] } },
         ],
       });
@@ -97,23 +99,87 @@ module.exports = {
   //Deplace une carte dans une colonne
   async moveCard(req, res) {
     try {
-      const { id } = req.params;
-      const { newColumnId } = req.body;
+      const cardId = req.params.id;
+      const { columnId, position } = req.body;
   
-      const card = await Card.findByPk(id);
+      // Ajout de la validation ici
+      if (typeof position !== "number" || position < 0) {
+        return res.status(400).json({ message: "Invalid position" });
+      }
+  
+      const card = await Card.findByPk(cardId);
       if (!card) {
         return res.status(404).json({ message: "Card not found" });
       }
   
-      card.columnId = newColumnId;
-      await card.save();
+      const oldColumnId = card.columnId;
   
-      res.json({ message: "Card moved successfully", card });
+      if (oldColumnId !== columnId) {
+        await Card.update(
+          { position: Sequelize.literal('position - 1') },
+          {
+            where: {
+              columnId: oldColumnId,
+              position: { [Sequelize.Op.gt]: card.position }
+            }
+          }
+        );
+  
+        await Card.update(
+          { position: Sequelize.literal('position + 1') },
+          {
+            where: {
+              columnId: columnId,
+              position: { [Sequelize.Op.gte]: position }
+            }
+          }
+        );
+  
+        card.columnId = columnId;
+        card.position = position;
+        await card.save();
+  
+      } else {
+        if (position > card.position) {
+          await Card.update(
+            { position: Sequelize.literal('position - 1') },
+            {
+              where: {
+                columnId: columnId,
+                position: {
+                  [Sequelize.Op.gt]: card.position,
+                  [Sequelize.Op.lte]: position
+                }
+              }
+            }
+          );
+        } else if (position < card.position) {
+          await Card.update(
+            { position: Sequelize.literal('position + 1') },
+            {
+              where: {
+                columnId: columnId,
+                position: {
+                  [Sequelize.Op.gte]: position,
+                  [Sequelize.Op.lt]: card.position
+                }
+              }
+            }
+          );
+        }
+  
+        card.position = position;
+        await card.save();
+      }
+  
+      res.status(200).json({ message: "Card moved successfully", card });
     } catch (error) {
-      res.status(500).json({ message: "Error moving card", error });
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
     }
   },
   
+
   // Supprime une carte
   async deleteCard(req, res) {
     try {
@@ -123,7 +189,8 @@ module.exports = {
       }
 
       await card.destroy();
-      res.status(200).json({ message: "Carte supprimée" });
+      //res.status(200).json({ message: "Carte supprimée" });
+      res.sendStatus(204).send(); // 204 No Content
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: "Erreur lors de la suppression" });

@@ -54,3 +54,5 @@ app.listen(5500, (error) => {
 
   console.log("Serveur lancé sur le port 5500");
 });
+
+module.exports = app;
