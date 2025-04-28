@@ -1,15 +1,355 @@
 openapi: 3.0.0
 
 info:
-  title:
-  description:
-  version:
+  title: Kanban API
+  description: API permettant de gérer des cartes, colonnes et catégories pour un système de type kanban
+  version: 1.0.0
 
 servers:
   - url: http://localhost:5500
-    description: Local server
+    description: Serveur Local
+
+tags:
+  - name: Cards
+    description: Gestion des cartes
+  - name: Columns
+    description: Gestion des colonnes
+  - name: Categories
+    description: Gestion des catégories
+  - name: Home
+    description: Page d'accueil
 
 components:
   schemas:
+    Card:
+      type: object
+      properties:
+        id:
+          type: integer
+        description:
+          type: string
+        position:
+          type: integer
+        columnId:
+          type: integer
+    Column:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        position:
+          type: integer
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
 
 paths:
+  /:
+    get:
+      tags:
+        - Home
+      summary: Affiche la page Hello World
+      responses:
+        200:
+          description: Page HTML affichée
+  
+  /api/cards:
+    get:
+      tags:
+        - Cards
+      summary: Liste toutes les cartes
+      responses:
+        200:
+          description: Succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Card'
+    post:
+      tags:
+        - Cards
+      summary: Crée une nouvelle carte
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                columnId:
+                  type: integer
+                categoryIds:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        201:
+          description: Carte créée
+
+  /api/cards/{id}:
+    get:
+      tags:
+        - Cards
+      summary: Récupère une carte par ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Carte trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
+        404:
+          description: Carte non trouvée
+    put:
+      tags:
+        - Cards
+      summary: Met à jour une carte
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                columnId:
+                  type: integer
+                categoryIds:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        200:
+          description: Carte mise à jour
+        404:
+          description: Carte non trouvée
+    delete:
+      tags:
+        - Cards
+      summary: Supprime une carte
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Carte supprimée
+        404:
+          description: Carte non trouvée
+
+  /api/cards/{id}/move:
+    put:
+      tags:
+        - Cards
+      summary: Déplace une carte
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                columnId:
+                  type: integer
+                position:
+                  type: integer
+      responses:
+        200:
+          description: Carte déplacée avec succès
+        400:
+          description: Mauvaise requête
+        404:
+          description: Carte non trouvée
+
+  /api/columns:
+    get:
+      tags:
+        - Columns
+      summary: Liste toutes les colonnes
+      responses:
+        200:
+          description: Succès
+    post:
+      tags:
+        - Columns
+      summary: Crée une nouvelle colonne
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        201:
+          description: Colonne créée
+
+  /api/columns/{id}:
+    get:
+      tags:
+        - Columns
+      summary: Récupère une colonne par ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Colonne trouvée
+        404:
+          description: Colonne non trouvée
+    put:
+      tags:
+        - Columns
+      summary: Met à jour une colonne
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        200:
+          description: Colonne mise à jour
+        404:
+          description: Colonne non trouvée
+    delete:
+      tags:
+        - Columns
+      summary: Supprime une colonne
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Colonne supprimée
+        404:
+          description: Colonne non trouvée
+
+  /api/categories:
+    get:
+      tags:
+        - Categories
+      summary: Liste toutes les catégories
+      responses:
+        200:
+          description: Succès
+    post:
+      tags:
+        - Categories
+      summary: Crée une nouvelle catégorie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        201:
+          description: Catégorie créée
+
+  /api/categories/{id}:
+    get:
+      tags:
+        - Categories
+      summary: Récupère une catégorie par ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Catégorie trouvée
+        404:
+          description: Catégorie non trouvée
+    put:
+      tags:
+        - Categories
+      summary: Met à jour une catégorie
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        200:
+          description: Catégorie mise à jour
+        404:
+          description: Catégorie non trouvée
+    delete:
+      tags:
+        - Categories
+      summary: Supprime une catégorie
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Catégorie supprimée
+        404:
+          description: Catégorie non trouvée
