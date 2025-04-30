@@ -33,8 +33,67 @@ cd kanban
 
 # 2. Installer les dépendances
 npm install
+```
+## 📂 Configuration de la base de données
+L'application utilise Sequelize avec une base de données PostgreSQL (ou autre selon ton projet). Pour configurer la base, voici les étapes :
+
+1. Initialiser Sequelize (si ce n’est pas déjà fait)
+
+```bash
+npx sequelize-cli init
+```
+Cela crée les dossiers suivants :
+
+config/ : fichiers de configuration (config.json ou config.js)
+
+models/
+
+migrations/
+
+seeders/
+
+2. Configuration du fichier config/config.js
+Adapte les informations dans config/config.js en fonction de ton environnement :
+
+```bash
+module.exports = {
+  development: {
+    username: "votre_utilisateur",
+    password: "votre_mot_de_passe",
+    database: "kanban_dev",
+    host: "127.0.0.1",
+    dialect: "mysql" 
+  },
+  test: {
+    username: "root",
+    password: null,
+    database: "kanban_test",
+    host: "127.0.0.1",
+    dialect: "mysql",
+    storage: ":memory:"
+  },
+  production: {
+    username: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    dialect: "mysql"
+  }
+};
+# N'oublier pas d créer ces bases de données dans votre sgbd
+```
+3. Créer la base de données
+```bash
+npx sequelize-cli db:create
+```
+4. Appliquer les migrations
+```bash
+npx sequelize-cli db:migrate
+```
+
 
 # 3. Lancer le serveur
+```bash
 npm start
 node index
 ```
@@ -98,4 +157,4 @@ Créer une Pull Request
 
 ## pour plus d'infos contactez-moi  romaricyt11@gmail.com
 
-![alt text](image.png)
+![swagger view](image.png)
